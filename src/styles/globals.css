@@ -68,10 +68,10 @@
  
 @layer base {
   * {
-    @apply border-border;
+    @apply border-[hsl(var(--border))];
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
   }
 }
 
@@ -81,12 +81,12 @@
 
 .prose a {
   @apply transition-colors duration-200;
-  @apply hover:text-primary;
+  @apply hover:text-[hsl(var(--primary))];
   @apply no-underline;
 }
 
 .prose pre {
-  @apply bg-muted;
-  @apply border border-border;
+  @apply bg-[hsl(var(--muted))];
+  @apply border border-[hsl(var(--border))];
   @apply rounded-lg;
 } 

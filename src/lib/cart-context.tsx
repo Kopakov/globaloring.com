@@ -1,5 +1,7 @@
+'use client';
+
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { createBrowserClient } from '@supabase/ssr';
 import { toast } from 'sonner';
 
 interface CartItem {
@@ -27,8 +29,22 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const [user, setUser] = useState<any>(null);
+  
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   useEffect(() => {
     if (user) {

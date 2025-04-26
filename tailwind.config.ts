@@ -1,8 +1,5 @@
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
-import animatePlugin from "tailwindcss-animate";
-import typographyPlugin from "@tailwindcss/typography";
-import formsPlugin from "@tailwindcss/forms";
 
 const config = {
   darkMode: ["class"],
@@ -81,7 +78,11 @@ const config = {
       },
     },
   },
-  plugins: [animatePlugin, typographyPlugin, formsPlugin],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/forms"),
+  ],
 } satisfies Config;
 
 export default config; 

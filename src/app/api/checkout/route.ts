@@ -1,50 +1,40 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { createClient } from '@supabase/supabase-js';
+import { headers } from 'next/headers';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+interface CheckoutItem {
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+}
 
-export async function POST(request: Request) {
+interface CheckoutRequest {
+  items: CheckoutItem[];
+}
+
+export async function POST(req: Request) {
   try {
-    const { items, total } = await request.json();
-    
-    // Get the user's cart
-    const { data: cart } = await supabase
-      .from('carts')
-      .select('id, profile_id')
-      .eq('profile_id', request.headers.get('x-user-id'))
-      .single();
+    const body = await req.json() as CheckoutRequest;
+    const headersList = headers();
+    const origin = headersList.get('origin') || 'http://localhost:3000';
 
-    if (!cart) {
-      return NextResponse.json(
-        { error: 'Cart not found' },
-        { status: 404 }
-      );
-    }
-
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: items.map((item: any) => ({
+      line_items: body.items.map((item) => ({
         price_data: {
           currency: 'usd',
           product_data: {
             name: item.name,
+            images: [item.image],
           },
           unit_amount: Math.round(item.price * 100),
         },
         quantity: item.quantity,
       })),
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/canceled`,
-      metadata: {
-        cart_id: cart.id,
-        profile_id: cart.profile_id,
-      },
+      success_url: `${origin}/checkout/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/cart`,
     });
 
     return NextResponse.json({ sessionId: session.id });

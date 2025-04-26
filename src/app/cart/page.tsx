@@ -18,7 +18,7 @@ function CartItems() {
       <div className="text-center py-12">
         <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
         <p className="text-muted-foreground mb-6">
-          Looks like you haven't added any items to your cart yet.
+          Looks like you haven&apos;t added any items to your cart yet.
         </p>
         <Button asChild>
           <Link href="/products">Continue Shopping</Link>
@@ -156,7 +156,8 @@ function TrashIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function CartPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+      <h1 className="text-2xl font-bold">Your Cart</h1>
+      <p className="text-muted-foreground">Review your items before checkout</p>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">

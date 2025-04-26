@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SupabaseProvider } from "@/lib/supabase-context";
+import { CartProvider } from "@/lib/cart-context";
 import { RootLayout } from "@/components/layout/root-layout";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -21,7 +23,11 @@ export default function Layout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <RootLayout>{children}</RootLayout>
+        <SupabaseProvider>
+          <CartProvider>
+            <RootLayout>{children}</RootLayout>
+          </CartProvider>
+        </SupabaseProvider>
       </body>
     </html>
   );

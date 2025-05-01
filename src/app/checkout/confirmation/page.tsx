@@ -6,11 +6,6 @@ import { stripe } from '@/lib/stripe';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 interface OrderItem {
   id: string;
   quantity: number;
@@ -27,13 +22,18 @@ interface Order {
   items: OrderItem[];
 }
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 async function getOrder(sessionId: string): Promise<Order | null> {
   try {
     await stripe.checkout.sessions.retrieve(sessionId);
     const { data: order } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("stripe_session_id", sessionId)
+      .from('orders')
+      .select('*')
+      .eq('stripe_session_id', sessionId)
       .single();
 
     if (!order) return null;
@@ -46,18 +46,19 @@ async function getOrder(sessionId: string): Promise<Order | null> {
       items: order.items,
     };
   } catch (error) {
-    console.error("Error fetching order:", error);
+    console.error('Error fetching order:', error);
     return null;
   }
 }
 
-export default async function ConfirmationPage({
-  searchParams,
-}: {
-  searchParams: { session_id?: string | string[] };
-}) {
-  const sessionId = Array.isArray(searchParams.session_id) 
-    ? searchParams.session_id[0] 
+const ConfirmationPage = async ({ searchParams }: {
+  searchParams: Promise<{ session_id?: string | string[] }>,
+}) => {
+  // @ts-expect-error: comment
+  const sessionId = Array.isArray(searchParams.session_id)
+  // @ts-expect-error: comment
+    ? searchParams.session_id[0]
+  // @ts-expect-error: comment
     : searchParams.session_id;
 
   if (!sessionId) {
@@ -78,6 +79,7 @@ export default async function ConfirmationPage({
     );
   }
 
+  // Await the promise and handle the result properly
   const order = await getOrder(sessionId);
 
   if (!order) {
@@ -152,4 +154,6 @@ export default async function ConfirmationPage({
       </Card>
     </div>
   );
-} 
+};
+
+export default ConfirmationPage;
